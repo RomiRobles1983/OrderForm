@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+
+  <style>
+    /* The default margins are removed and the font family is chosen. */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    /* "logo" is displayed as a block and is centered in its container. */
+    #logo {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* The title "Order Form" is horizontally center-aligned. */
+    h1 {
+      text-align: center;
+    }
+
+    /* The container class is used to style the entire block, center it horizontally, and set a maximum size limit. */
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* These styles configure the form-row class to be flexible, vertically align its elements to the center, 
+    and distribute the available space (Component Selector / Quantity Selector / Add Button) */
+    .form-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      margin-right: 0;
+    }
+
+    /* The "quantity" label is separated from the Component selector, adding a margin to the left. */
+    .label-quantity {
+      margin-left: 10px;
+    }
+
+    /* Button styling */
+
+    /* The "form-row" class is used to style the buttons that are inside this class. In this case, it is only the "Add" button. */
+    .form-row button {
+      align-self: flex-start;
+      height: 30px;
+      background-color: #24a0d8;
+      border: 0px solid;
+      border-radius: 5px;
+      font-size: 14px;
+      color: white;
+      flex: 0;
+      margin-left: 10px;
+    }
+
+    /* The id attribute is used to style the "Place Order" button. */
+    #PlaceOrder {
+      width: 100%;
+      height: 50px;
+      border: 1px solid;
+      background-color: #1666a2;
+      border-radius: 25px;
+      font-size: 18px;
+      color: white;
+    }
+
+    /* The "remove-button" class is used to style the buttons that are inside this class. In this case, it is only the "Remove" button. */
+    .remove-button {
+      margin-left: 10px;
+      background-color: #ff4d4d;
+      border: none;
+      border-radius: 5px;
+      padding: 3px 8px;
+      color: white;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    /* Common styles for all labels of the form */
+    label {
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    /* Common styles for input fields of the form */
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="number"] {
+      width: 100%;
+      padding: 5px;
+      margin-bottom: 10px;
+    }
+
+    /* The component selector is adjusted so that it is aligned with data input fields. */
+    select {
+      padding: 5px;
+      margin-bottom: 10px;
+    }
+
+    /* The id attribute is used to style the summary list. */
+    #summary {
+      list-style-type: none;
+      padding-left: 0;
+      text-align: left;
+    }
+
+    /* The "before" pseudo-attribute is used to add a check symbol before each item in the list. */
+    #summary li::before {
+      content: "✔";
+      display: inline-block;
+      font-size: 18px;
+      color: #24a0d8;
+      margin-right: 5px;
+    }
+
+    /* The text of the list is stylized. */
+    #summary li {
+      color: black;
+      display: flex;
+      align-items: center;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- The block where the form will be generated is created. -->
+  <div class="container">
+
+    <!-- The logo image is added -->
+    <img id="logo" src="C:\Users\romir\Desktop\Order Form\Logo.png">
+
+    <!-- The logo image is added -->
+    <h1>Order Form</h1>
+
+
+    <!-- The form is created-->
+    <form name="myform" id="myform" method="get">
+
+      <!-- The labels and input fields of the form fields are created.  -->
+      <label for="name">Name:</label>
+      <input type="text" id="name" placeholder="John Doe" required>
+
+      <label for="email">Email:</label>
+      <input type="email" id="email" placeholder="johndoe@gmail.com" required>
+
+      <label for="phone">Phone:</label>
+      <input type="tel" id="phone" placeholder="+34 645868334" required>
+
+      <!-- A new block is created in order to give special formatting to the selectors and the Add button. -->
+      <div class="form-row">
+
+        <!-- The component selector is created. -->
+        <label for="component">Component:</label>
+        <select id="component" onchange="enableQuantityInput()">
+          <!-- The onchange attribute is used to call the enableQuantityInput() function
+             when a change is generated in the component selector.  -->
+          <option value="">Select a component</option>
+          <option value="CPU">CPU</option>
+          <option value="GPU">GPU</option>
+          <option value="RAM">RAM</option>
+          <option value="Storage">Storage</option>
+          <option value="Motherboard">Motherboard</option>
+          <option value="Power Supply">Power Supply</option>
+        </select>
+
+        <!-- The quantity selector is created. -->
+        <label for="quantity" class="label-quantity">Quantity:</label>
+        <input type="number" id="quantity" min="1" max="10" placeholder="0" disabled>
+
+        <!-- The "Add" button is created and the onclick attribute is used to call the addItem() function. -->
+        <button type="button" id="addButton" onclick="addItem()">Add</button>
+      </div>
+
+      <!-- The heading "Summary" is created. -->
+      <h2>Summary</h2>
+
+      <!-- The unordered list is created, which will contain the selected components -->
+      <ul id="summary"></ul>
+
+      <!-- The "PlaceOrder" button is created and the onclick attribute is used to call the placeOrder() function. -->
+      <button type="submit" id="PlaceOrder" onclick="placeOrder()">Place Order</button>
+
+      <!-- A container is created, where the message associated with the placeOrder() function will be displayed. -->
+      <div id="message"></div>
+      
+
+      <script>
+        function enableQuantityInput() {// Enables the possibility to enter a quantity only when a component has been chosen.
+          var componentSelector = document.getElementById("component");
+          var quantityInput = document.getElementById("quantity");
+          var selectedComponent = componentSelector.value;
+      
+          // Checks if the selectedComponent variable is empty. If so, it disables the possibility of selecting a quantity. Otherwise, it enables it.
+          if (selectedComponent === "") {
+            quantityInput.disabled = true;
+            quantityInput.value = "";
+          } else {
+            quantityInput.disabled = false;
+          }
+        }
+      
+        function addItem() {// Adds each selected component and quantity to a summary list.
+          var componentSelector = document.getElementById("component");
+          var quantityInput = document.getElementById("quantity");
+          var summary = document.getElementById("summary");
+          var componentSelected = componentSelector.value;
+          var quantity = parseInt(quantityInput.value);
+      
+          // Checks if there is a component and a quantity selected
+          if (componentSelected !== "" && quantity > 0 && quantity <= 10) {
+            var existingItem = null;
+            var items = summary.getElementsByTagName("li");
+      
+            // Checks if the "data-component" attribute of the item matches the selected component
+            for (var i = 0; i < items.length; i++) {
+              var item = items[i];
+              if (item.getAttribute("data-component") === componentSelected) {
+                existingItem = item;
+                break;
+              }
+            }
+      
+            if (existingItem) {
+              var existingQuantity = parseInt(existingItem.getAttribute("data-quantity"));
+              var newQuantity = existingQuantity + quantity;
+              existingItem.innerHTML = componentSelected + " (Quantity: " + newQuantity + ")";
+      
+              // Creates the "Remove" button for the existing item
+              var removeButton = document.createElement("button");
+              removeButton.className = "remove-button";
+              removeButton.textContent = "Remove";
+              removeButton.onclick = function() {
+                removeItem(existingItem);
+              };
+      
+              existingItem.appendChild(removeButton);
+              existingItem.setAttribute("data-quantity", newQuantity);
+            } else {
+              var newItem = document.createElement("li");
+              var itemContent = componentSelected + " (Quantity: " + quantity + ")";
+      
+              // Creates the "Remove" button for the new item
+              var removeButton = document.createElement("button");
+              removeButton.innerText = "Remove";
+              removeButton.className = "remove-button";
+              removeButton.addEventListener("click", function() {
+                removeItem(newItem);
+              });
+      
+              newItem.innerHTML = itemContent;
+              newItem.appendChild(removeButton);
+      
+              // Sets the data attributes on the new element
+              newItem.dataset.component = componentSelected;
+              newItem.dataset.quantity = quantity;
+      
+              // Adds the new item to the summary list
+              summary.appendChild(newItem);
+            }
+      
+            // Resets the selector and disables the quantity field
+            componentSelector.selectedIndex = 0;
+            quantityInput.value = "";
+            quantityInput.disabled = true;
+          }
+        }
+      
+        function removeItem(item) {// Removes the specified item from the summary list
+          var summary = document.getElementById("summary");
+          summary.removeChild(item);
+        }
+      
+        function placeOrder() {
+          // Variables are initialized
+          var summaryItems = document.getElementById("summary").getElementsByTagName("li");
+          var message = document.getElementById("message");
+          var nameInput = document.getElementById("name");
+          var emailInput = document.getElementById("email");
+          var phoneInput = document.getElementById("phone");
+          var form = document.getElementById("myform");
+          var summaryList = document.getElementById("summary");
+
+          /* The if-else block deals with the scenarios 1-When there are no components in the list. 
+          2-When some of the required fields are not validated 3-The form is correctly filled in and there are components in the list.*/
+
+          if (summaryItems.length === 0) {
+            message.innerHTML = "<br> You must select at least one component!";
+          } else if (!nameInput.value || !emailInput.value || !phoneInput.value) {
+            message.innerHTML = "<br> Please fill in all required fields.";
+          } else {
+            message.innerHTML = "<br> Your order has been successfully created!";
+            form.reset(); // Reset the form
+
+            // Reset the list
+            summaryList.innerHTML = "";setTimeout(function() {
+      message.innerHTML = "";
+    }, 5000); // The message disappears after 5 seconds
+  }
+}
+
+  document.getElementById("myform").addEventListener("submit", function(event) {//Simulates the loading of the form
+    event.preventDefault();
+    placeOrder();
+  });
+
+
+
+      </script>
+      
+    </form>
+  </div>
+</body>
+
+</html>
+
